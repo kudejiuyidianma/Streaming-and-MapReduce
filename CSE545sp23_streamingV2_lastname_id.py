@@ -82,7 +82,13 @@ def task1A_meanRGBsStream(element, returnResult = True):
 def task1B_bloomSetup(elements_in_set):
     #[TODO]#
     #setup the bloom filter memory to be able to filter streaming elements
-    for element in elements_in_set:
+    
+    fPosRate = 0.01
+    # Num of hashes
+    k = round(-log2(fPosRate) / log2(2))
+    # Hashes seeds
+    seeds = [round(random()*100) for i in range(0,k)]
+
         
     return 
     

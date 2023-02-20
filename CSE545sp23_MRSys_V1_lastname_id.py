@@ -91,7 +91,7 @@ class MRSysSim:
         return node_number
 
 
-    def reduceTask(self, kvs, namenode_fromR): 
+    def reduceTask(self, kvs, namenode_fromR):
         #Sort such that all values for a given key are in a 
         #list for that key 
         vsPerK = dict()
@@ -153,10 +153,13 @@ class MRSysSim:
         #STEP-4
         #"send" each key-value pair to its assigned reducer by placing each 
         #into a list of lists, where to_reduce_task[task_num] = [list of kv pairs]
-        to_reduce_task = []
+        to_reduce_task = [[] for i in range(self.num_reduce_tasks)]
         #[[TODO:PartII.A]]
-
-        
+        for (k, v) in namenode_m2r:
+            try:
+                to_reduce_task[k].append(v)
+            except KeyError:
+                to_reduce_task[k] = [v]
         #STEP-5
         #launch the reduce tasks as a new process for each. 
         processes = []
@@ -218,9 +221,21 @@ class matrixMultMRSys(MRSysSim):
         rowcolSum = 0#stores the sum
         #separate m and n, keyed by j
         #[[TODO:PartII.B]]
+        n = len(vs)//2
+        row_m = [0]*n
+        row_n = [0]*n
+        for v in vs:
+            if v[0] == 'n':
+                row_n[v[1]] = v[2]
+            else:
+                row_m[v[1]] = v[2]
+
+
 
         #sum product of m and n js:
         #[[TODO:PartII.B]]
+        for i in range(0,n):
+            rowcolSum += row_m[i]*row_n[i]
 
 
         return (k, rowcolSum)
@@ -229,11 +244,14 @@ class meanMRSys(MRSysSim):
     #[[TODO:PartII.C]] Create the map and reduce functions to return the mean r, g, and, b
     def map(self, k, v): 
         #[TODO]#
-        return []
+        r = ('r', v[0])
+        g = ('g', v[1])
+        b = ('b', v[2])
+        return [r, g, b]
     
     def reduce(self, k, vs): 
         #[TODO]#
-        return []
+        return [k, np.around(np.mean(vs), 3)]
 			
 ##########################################################################
 ##########################################################################
@@ -278,19 +296,19 @@ if __name__ == "__main__": #[Uncomment peices to test]
     with open(filename, 'r') as infile:
         data = [eval(i.strip()) for i in infile.readlines()]
     data = list(zip(range(len(data)), data))
-        
+
     print("\nExample of input data: ", data[:10])
     mrObject = meanMRSys(data, 4, 3)
     mrObject.runSystem()
 
-    
-    ###################
+
+    ##################
     ##run Matrix Multiply:
     print("\n\n*****************\n Matrix Multiply\n*****************\n")
     #format: 'A|B:A.size:B.size
     test1 = [(('A:1,2:2,1', 0, 0), 2.0), (('A:1,2:2,1', 0, 1), 1.0), (('B:1,2:2,1', 0, 0), 1), (('B:1,2:2,1', 1, 0), 3)   ]
     test2 = createSparseMatrix([[1, 2, 4], [4, 8, 16]], 'A:2,3:3,3') + createSparseMatrix([[1, 1, 1], [2, 2, 2], [4, 4, 4]], 'B:2,3:3,3')
-    
+
     test3 = createSparseMatrix(np.random.randint(-20, 20, (5,20)), 'A:5,20:20,4') + \
 	    createSparseMatrix(np.random.randint(-20, 20, (20,4)), 'B:5,20:20,4')
 
@@ -299,7 +317,7 @@ if __name__ == "__main__": #[Uncomment peices to test]
 
     mrObject = matrixMultMRSys(test2, 16, 10)
     mrObject.runSystem()
-    
+
     mrObject = matrixMultMRSys(test3, 16, 10)
     mrObject.runSystem()
 
