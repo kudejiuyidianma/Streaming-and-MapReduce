@@ -48,7 +48,31 @@ where k is the number of hashes, p is the desired false positive rate (in this c
  
  
  ## Part 2: MapReduce System
+ ### Basic Algorithm
+ Step1: The following two lists are shared by all processes in order to simulate the communication
+ ```
+ # Two array
+ #stores the reducer task assignment and each key-value pair returned from mappers in the form: [(reduce_task_num, (k, v)), ...]
+ namenode_m2r = Manager().list()
  
+ #stores key-value pairs returned from reducers in the form [(k, v), ...]
+ namenode_fromR = Manager().list()
+ ```
+ 
+ Step2:  Divide up the data into chunks accord to num_map_tasks, launch a new process for each map task, passing the chunk of data to it. 
+  - Runs the mappers on each record within the data_chunk and assigns each k,v to a reduce task
+  - Assign each kv pair to a reducer task
+  
+ Step3: Join map task processes back
+ 
+ Step4: "send" each key-value pair to its assigned reducer by placing each into a list of lists, where to_reduce_task[task_num] = [list of kv pairs]
+ 
+ Step5: Launch the reduce tasks as a new process for each. 
+ Step 6: Join the reduce tasks back
+ 
+ ### Task A: Word Count MapReduce System
+ ### Task B: Mean RGB MapReduce System
+ ### Task C: Matrix Multiplication MapReduce System
     
     
 
