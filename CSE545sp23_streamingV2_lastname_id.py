@@ -41,7 +41,7 @@ memory =  deque([None] * MEMORY_SIZE, maxlen=MEMORY_SIZE) #do not edit
 def task1A_meanRGBsStream(element, returnResult = True):
     #[TODO]#
     #procss the element you may only use memory, storing at most 1000
-    
+
     if returnResult: #when the stream is requesting the current result
         result = (0.0, 0.0, 0.0)
         #[TODO]#
@@ -66,7 +66,7 @@ def task1A_meanRGBsStream(element, returnResult = True):
         memory.appendleft(bsum)
         memory.appendleft(gsum)
         memory.appendleft(rsum)
-        
+
         if returnResult: #when the stream is requesting the current result
             #[TODO]#
             #any additional processing to return the result at this point
@@ -82,22 +82,35 @@ def task1A_meanRGBsStream(element, returnResult = True):
 def task1B_bloomSetup(elements_in_set):
     #[TODO]#
     #setup the bloom filter memory to be able to filter streaming elements
-    
+    # clear up the memory
+    for i in memory:
+        i = 0
     fPosRate = 0.01
     # Num of hashes
     k = round(-log2(fPosRate) / log2(2))
     # Hashes seeds
-    seeds = [round(random()*100) for i in range(0,k)]
+    seeds = [round(random()*100) for i in range(0, k)]
+    for rgb in elements_in_set:
+        rgb = rgb[1:-2].split(',')
+        r = float(rgb[0])//100
+        g = float(rgb[1])//100
+        b = float(rgb[2])//100
+        rgb0 = (r, g, b)
+        for seed in seeds:
+            i = mmh3.hash(rgb0, seed) % 1000
+            memory[i] = 1
 
-        
-    return 
-    
+    return
+
 def task1B_bloomStream(element):
     #[TODO]#
     #procss the element, using at most the 1000 dimensions of memory
     #return True if the element is determined to be in the bloom filter set
     result = True if random() < .005 else False
-    
+
+    # element = eval(element) + (0,1)
+
+
     #replace the following line with the result
     return result
 
@@ -111,9 +124,9 @@ def getMemorySize(l): #returns sum of all element sizes
     return sum([getsizeof(e) for e in l])+getsizeof(l)
 
 if __name__ == "__main__": #[Uncomment peices to test]
-    
+
     print("\n\nTESTING YOUR CODE\n")
-    
+
     ###################
     ## The main stream loop: 
     print("\n\n*************************\n Beginning stream input \n*************************\n")
@@ -121,33 +134,33 @@ if __name__ == "__main__": #[Uncomment peices to test]
     printLines = frozenset([5**i for i in range(1, 20)]) #stores lines to print
     peakMem = 0 #tracks peak memory usage
     all = []#DEBUG
-    
+
     with open(filename, 'r') as infile:
         i = 0#keeps track of lines read
         for line in infile:
-        
+
             #remove \n and convert to int
             element = line.strip()
             #all.append(element)#DEBUG
             i += 1
-            
-            #call tasks         
-            if i in printLines: #print status at this point: 
+
+            #call tasks
+            if i in printLines: #print status at this point:
                 result1a = task1A_meanRGBsStream(element, returnResult=True)
                 print(" Result at stream element # %d:" % i)
                 print("   1A:   means: %s" % str(["%.2f" % float(m) for m in result1a]))
                 print(" [current memory size: %d]\n" % \
                     (getMemorySize(memory)))
-                
+
             else: #just pass for stream processing
                 result1a = task1A_meanRGBsStream(element, False)
-                
+
             try:
                 memUsage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
                 if memUsage > peakMem: peakMem = memUsage
             except:
                 pass
-        
+
     print("\n*******************************\n    Stream mean Terminated \n*******************************")
     if peakMem > 0:
         print("(peak memory usage was: ", peakMem, ")")
@@ -164,10 +177,10 @@ if __name__ == "__main__": #[Uncomment peices to test]
             if i > bloomSetSize:
                 break
         #setup bloom
-        task1B_bloomSetup(bloomSet)        
+        task1B_bloomSetup(bloomSet)
 
         print("\n*******************************\n   Bloom Setup, Streaming: \n*******************************")
-        
+
         for line in infile:
             #remove \n and convert to int
             element = line.strip()
@@ -175,20 +188,20 @@ if __name__ == "__main__": #[Uncomment peices to test]
 
             #call tasks
             result1b = task1B_bloomStream(element)
-            if result1b: #print status at this point:                
+            if result1b: #print status at this point:
                 print(" Result at stream element # %d:" % i)
                 print("   1B: element: %s" % str(element))
                 print("   1B:   bloom: %s" % str(result1b))
                 print(" [current memory size: %d]\n" % \
-                    (getMemorySize(memory)))              
+                    (getMemorySize(memory)))
             try:
                 memUsage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
                 if memUsage > peakMem: peakMem = memUsage
             except:
                 pass
-        
+
     print("\n*******************************\n   Stream bloom Terminated \n*******************************")
     if peakMem > 0:
         print("(peak memory usage was: ", peakMem, ")")
 
-        
+
