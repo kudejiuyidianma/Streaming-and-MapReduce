@@ -89,7 +89,7 @@ def task1B_bloomSetup(elements_in_set):
     for i in memory1b:
         memory1b[i] = 0
     for rgb in elements_in_set:
-        index = mmh3.hash(rgb) % 60000
+        index = mmh3.hash(rgb) % 160000
         memory1b[index] = 1
     return 
     
@@ -97,11 +97,31 @@ def task1B_bloomStream(element):
     #[TODO]#
     #procss the element, using at most the 1000 dimensions of memory
     #return True if the element is determined to be in the bloom filter set
+    def checkFilter(rgb):
+        filter_index = mmh3.hash(rgb) % 160000
+        if memory1b[filter_index] == 0:
+            return False
+        return True
+
     result = True
-    i = mmh3.hash(element) % 60000
-    if memory1b[i] == 0:
-        print('false')
-        return False
+    rgb_str = element[1:-1]
+    rgb_list = rgb_str.split(', ')
+    r = int(rgb_list[0])-1
+    g = int(rgb_list[1])-1
+    b = int(rgb_list[2])-1
+
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                if r+i < 0 or g+j < 0 or b+k < 0:
+                    break
+                check_str = '(' + str(r+i) + ', ' + str(g+j) + ', ' + str(b+k) + ')'
+                flag = checkFilter(check_str)
+                if not flag:
+                    return False
+
+
+
     #replace the following line with the result
     return result
 
