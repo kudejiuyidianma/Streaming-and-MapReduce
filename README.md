@@ -1,5 +1,5 @@
 # Streaming-and-MapReduce
-## Background
+# Background
 - To implement prototypical streaming algorithms.
 - To think through implementation of a novel streaming algorithm under the constraints of limited memory.
 - To implement parts of a map reduce system in order to become familiar with what it must do behind the scenes.
@@ -10,8 +10,8 @@
  pip install mmh3
  ```
 
-## Part 1
-### Task A: Mean RGB Values
+# Part 1
+## Task A: Mean RGB Values
 Goal: Finding the mean of the rgb values at any point in the stream. 
 
 Inputs are the color of a single sold cell phone case where the color is represented by a triple defining  (red, green, blue) with integers ranging from 1 to 1,000,000.
@@ -27,7 +27,7 @@ Inputs are the color of a single sold cell phone case where the color is represe
 
 Thus, mean rgb value = rsum/cnt, gsum/cnt, bsum/cnt.
 
-### Task B: Bloom Filter
+## Task B: Bloom Filter
 Goal: Implement a bloom filter in order to find rgbs in the stream that match a given set of colors.
 
 Req: Two triples of rgb values will be considered a match if each of the r, g, b values differ by less than 100.
@@ -47,8 +47,8 @@ where k is the number of hashes, p is the desired false positive rate (in this c
  
  
  
- ## Part 2: MapReduce System
- ### Basic Algorithm
+ # Part 2: MapReduce System
+ ## Basic Algorithm
  Step1: The following two lists are shared by all processes in order to simulate the communication
  ```
  # Two array
@@ -76,12 +76,12 @@ where k is the number of hashes, p is the desired false positive rate (in this c
  
  For each key-value pair in data_chunk, 1) mapping, 2) get chunk_kvs, 3) store in the mapped_kvs
  
- ### Task A: Word Count MapReduce System
+ ## Task A: Word Count MapReduce System
  Goal: Assign the key_value pair to the specific reduce task based on the reduce_task_num of the elements.
  
  Format of elements in namenode_m2r: [[reduce_task_num, (word_key, word_count)], [], [], ...]
  
- ### Task B: Mean RGB MapReduce System
+ ## Task B: Mean RGB MapReduce System
  Goal: Implement map and reduce function to calculate the mean value of r, b, g.
  
  In the map task, we assign the value of red, blue and green a different key. This key indicates which reduce task will handle this key-value pair.
@@ -89,7 +89,7 @@ where k is the number of hashes, p is the desired false positive rate (in this c
  In the reduce task, get the mean value for all red, blue and green individually.
  
  
- ### Task C: Matrix Multiplication MapReduce System
+ ## Task C: Matrix Multiplication MapReduce System
  Goal: Implement reduce function to implement matrix multiplication.
  
  Step1: separate m and n, keyed by j
