@@ -68,11 +68,31 @@ where k is the number of hashes, p is the desired false positive rate (in this c
  Step4: "send" each key-value pair to its assigned reducer by placing each into a list of lists, where to_reduce_task[task_num] = [list of kv pairs]
  
  Step5: Launch the reduce tasks as a new process for each. 
+ 
  Step 6: Join the reduce tasks back
+  ```
+ mapped_kvs = [] // used to store key-value pairs after map task
+ ```
+ 
+ For each key-value pair in data_chunk, 1) mapping, 2) get chunk_kvs, 3) store in the mapped_kvs
  
  ### Task A: Word Count MapReduce System
+ Goal: Assign the key_value pair to the specific reduce task based on the reduce_task_num of the elements.
+ 
+ Format of elements in namenode_m2r: [[reduce_task_num, (word_key, word_count)], [], [], ...]
+ 
  ### Task B: Mean RGB MapReduce System
+ Goal: Implement map and reduce function to calculate the mean value of r, b, g.
+ 
+ In the map task, we assign the value of red, blue and green a different key. This key indicates which reduce task will handle this key-value pair.
+ 
+ In the reduce task, get the mean value for all red, blue and green individually.
+ 
+ 
  ### Task C: Matrix Multiplication MapReduce System
-    
-    
+ Goal: Implement reduce function to implement matrix multiplication.
+ 
+ Step1: separate m and n, keyed by j
+ 
+ Step2: sum product of m and n js
 
