@@ -234,7 +234,7 @@ class matrixMultMRSys(MRSysSim):
 
         #sum product of m and n js:
         #[[TODO:PartII.B]]
-        for i in range(0,n):
+        for i in range(0, n):
             rowcolSum += row_m[i]*row_n[i]
 
 

@@ -54,10 +54,10 @@ def task1A_meanRGBsStream(element, returnResult = True):
     bsum = memory1a.popleft()
     cnt = memory1a.popleft()
 
-    rsum = r if rsum == None else rsum + r
-    gsum = g if gsum == None else gsum + g
-    bsum = b if bsum == None else bsum + b
-    cnt = 1 if cnt == None else cnt + 1
+    rsum = r if rsum is None else rsum + r
+    gsum = g if gsum is None else gsum + g
+    bsum = b if bsum is None else bsum + b
+    cnt = 1 if cnt is None else cnt + 1
 
     memory1a.appendleft(cnt)
     memory1a.appendleft(bsum)
@@ -83,14 +83,29 @@ memory1b =  deque([0] * MEMORY_SIZE, maxlen=MEMORY_SIZE) #do not edit
 
 ##You may add custom functions here. Storage of anything besides hash functions is not permitted
 
+def hashes(element):
+    fPosRate = 0.01
+    # Num of hashes
+    k = round(-log2(fPosRate) / log2(2))
+    # Hashes seeds
+    seeds = [round(random()*100) for i in range(0, k)]
+    index = []
+    for seed in seeds:
+        index.append(mmh3.hash(element, seed) % MEMORY_SIZE)
+
+    return index
+
+
 def task1B_bloomSetup(elements_in_set):
     #[TODO]#
     #setup the bloom filter memory to be able to filter streaming elements
     for i in memory1b:
         memory1b[i] = 0
+
     for rgb in elements_in_set:
-        index = mmh3.hash(rgb) % 160000
-        memory1b[index] = 1
+        index = hashes(rgb)
+        for i in index:
+            memory1b[i] = 1
     return 
     
 def task1B_bloomStream(element):
@@ -98,17 +113,18 @@ def task1B_bloomStream(element):
     #procss the element, using at most the 1000 dimensions of memory
     #return True if the element is determined to be in the bloom filter set
     def checkFilter(rgb):
-        filter_index = mmh3.hash(rgb) % 160000
-        if memory1b[filter_index] == 0:
-            return False
+        filter_index = hashes(rgb)
+        for i in filter_index:
+            if memory1b[i] == 0:
+                return False
         return True
 
     result = True
     rgb_str = element[1:-1]
     rgb_list = rgb_str.split(', ')
-    r = int(rgb_list[0])-1
-    g = int(rgb_list[1])-1
-    b = int(rgb_list[2])-1
+    r = int(rgb_list[0]) - 1
+    g = int(rgb_list[1]) - 1
+    b = int(rgb_list[2]) - 1
 
     for i in range(3):
         for j in range(3):
